@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:mynotes2/constants/routes.dart';
 import 'package:mynotes2/utilities/show_eror_dialog.dart';
 
