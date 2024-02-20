@@ -1,9 +1,35 @@
+import 'dart:math';
+
 import 'package:mynotes2/services/auth/auth_exceptions.dart';
 import 'package:mynotes2/services/auth/auth_provider.dart';
 import 'package:mynotes2/services/auth/auth_user.dart';
 import 'package:test/test.dart';
 
-void main() {}
+void main() {
+  group('Mock Authentication', () {
+    final provider = MockAuthProvider();
+
+    test('Should not be initialized to begin with', () {
+      expect(provider._isInitialized, false);
+    });
+
+    test('Cannot LogOut If Not Initialized', () {
+      expect(
+        provider.logOut(),
+        throwsA(const TypeMatcher<NotInitializedException>()),
+      );
+    });
+
+    test('Should be able to be initialized', () async {
+      await provider.initialize();
+      expect(provider._isInitialized, true);
+    });
+
+    test('User should be null after initialization', () {
+      expect(provider.currentUser, null);
+    });
+  });
+}
 
 class NotInitializedException implements Exception {}
 
