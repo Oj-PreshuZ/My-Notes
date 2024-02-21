@@ -28,6 +28,21 @@ void main() {
     test('User should be null after initialization', () {
       expect(provider.currentUser, null);
     });
+
+    test('Should be able to be initialize in less than 2 seconds', () async {
+      await provider.initialize();
+      expect(provider._isInitialized, true);
+    }, timeout: const Timeout(Duration(seconds: 2)));
+
+    test('Create User Should Delegate To Login Function', () async {
+      final badEmailUser = provider.createUser(
+        email: 'ojiepp2000@gmail.com',
+        password: 'anypassword',
+      );
+
+      expect(badEmailUser,
+          throwsA(const TypeMatcher<UserNotFoundAuthException>()));
+    });
   });
 }
 
@@ -66,7 +81,7 @@ class MockAuthProvider implements AuthProvider {
     required String password,
   }) {
     if (!_isInitialized) throw NotInitializedException();
-    if (email == 'ojient2000.com') throw UserNotFoundAuthException();
+    if (email == 'ojiepp2000@gmail.com') throw UserNotFoundAuthException();
     if (password == '12345678') throw WrongPasswordAuthException();
     const user = AuthUser(isEmailVerified: false);
     _user = user;
