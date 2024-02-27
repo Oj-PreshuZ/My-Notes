@@ -40,8 +40,46 @@ void main() {
         password: 'anypassword',
       );
 
-      expect(badEmailUser,
-          throwsA(const TypeMatcher<UserNotFoundAuthException>()));
+      expect(
+        badEmailUser,
+        throwsA(
+          const TypeMatcher<UserNotFoundAuthException>(),
+        ),
+      );
+      final badPasswordUser = provider.createUser(
+        email: 'someone@bar.com',
+        password: 'foobar',
+      );
+      expect(
+        badPasswordUser,
+        throwsA(
+          const TypeMatcher<WrongPasswordAuthException>(),
+        ),
+      );
+
+      final user = await provider.createUser(
+        email: 'Foo',
+        password: 'Bar',
+      );
+      expect(provider.currentUser, user);
+      expect(user.isEmailVerified, false);
+    });
+
+    test('Logged in user should be able to get verified', () {
+      provider.sendEmailVerification();
+      final user = provider.currentUser;
+      expect(user, isNotNull);
+      expect(user!.isEmailVerified, true);
+    });
+
+    test('Should be able to log out and log in again', () async {
+      await provider.logOut();
+      await provider.logIn(
+        email: 'email',
+        password: 'password',
+      );
+      final user = provider.currentUser;
+      expect(user, isNotNull);
     });
   });
 }
@@ -59,6 +97,10 @@ class MockAuthProvider implements AuthProvider {
     required String password,
   }) async {
     if (!_isInitialized) throw NotInitializedException();
+
+    if (email == 'ojiepp2000@gmail.com') throw UserNotFoundAuthException();
+    if (password == 'foobar') throw WrongPasswordAuthException();
+
     await Future.delayed(const Duration(seconds: 1));
     return logIn(
       email: email,
